@@ -13,19 +13,14 @@ class Bot():
         
     def connect(self):
         self.browser.get('https://www.aemet.es/en/eltiempo/prediccion/avisos')
-        phenomena_table = self.wait.until(EC.presence_of_element_located((By.ID, 'listado-avisos')))
-        phenomena_cells = phenomena_table.find_element(By.CLASS_NAME, 'table')
-        phenomena_rows = phenomena_cells.find_elements(By.TAG_NAME, 'td')
-        for cell in phenomena_rows:
-            phenomena_rows = cell.text
-            print(phenomena_rows)
-            phenomena_rows = phenomena_rows.splitlines()
-            headers = ['Phenomenon','Value','Warnig Level','Probability','Warning Zone','Beginning Time','Ending Time','Comment']
-            cols = len(headers)
-            #print(phenomena_rows)
-            tabledata = [phenomena_rows[i:i + cols] for i in range(0, len(phenomena_rows), cols)]
-            print(tabledata)
-    
+        wrapper = self.wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, '#listado-avisos .table')))
+        phenomena_cell = wrapper.find_elements(By.TAG_NAME, 'td')
+        headers = ['Phenomenon','Value','Warnig Level','Probability','Warning Zone','Beginning Time','Ending Time','Comment']
+        cols = len(headers)
+        all_cells = [cell.text for cell in phenomena_cell]
+        tabledata = [all_cells[i:i+cols] for i in range(0, len(all_cells), cols)]
+        print(tabulate(tabledata,headers,tablefmt="grid"))
+
 
 bot = Bot()
 bot.connect()
